@@ -23,12 +23,13 @@ export const useHttp = () => {
             const data = await response.json();
 
             if (!response.ok) {
-                //console.log(data.errors);
-
                 const errors = {};
-                data.errors.forEach(error => {
-                    errors[error.param] = error.msg;
-                })
+                if (data.errors) {
+                    data.errors.forEach(error => {
+                        errors[error.param] = error.msg;
+                    })
+                }
+                errors.message = data.message;
                 throw errors || 'Something went wrong'; // error thrown in catch
             }
             setLoading(false);
@@ -42,7 +43,7 @@ export const useHttp = () => {
         }
     }, []);
 
-    const clearError = () => setError(null);
+    const clearError = () => setTimeout(() => setError(null), 3000);
 
     return {loading, error, request, clearError};
 }
