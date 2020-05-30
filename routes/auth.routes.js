@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const {check, validationResult} = require('express-validator');
 const User = require('../models/User');
+
 // /api/auth
 router.post(
     '/register',
@@ -20,49 +21,44 @@ router.post(
             return res.status(400).json({
                 errors: errors.array(),
                 message: 'Incorrect data while register new user'
-            })
+            });
         }
 
         const {email, password} = req.body;
-
         const candidate = await User.findOne({email});
 
         if (candidate) {
-            return res.status(400).json({message: 'Email adress already exists '})
+            return res.status(400).json({message: 'Email adress already exists '});
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
         const user = new User({email, password: hashedPassword});
 
         await user.save();
-
         res.status(201).json({message: 'User was created'});
-
-
     } catch (e) {
-        res.status(500).json({message: 'Something went wrong. Try again'})
+        res.status(500).json({message: 'Something went wrong. Try again'});
     }
-})
+});
 
 router.post(
     '/login',
     [
-        check('email', 'Enter valid email').normalizeEmail().isEmail(),
-        check('password', 'Password is required').exists()
+        check('email', 'Enter valid email').isEmail(),
+        check('password', 'Password is required').notEmpty()
     ],
     async (req, res) => {
     try {
-        const errors = validationResult();
+        const errors = validationResult(req);
 
-        if(!errors.isEmpty) {
-            res.status(400).json({
+        if(!errors.isEmpty()) {
+            return res.status(400).json({
                 errors: errors.array(),
                 message: 'While login appeared some troubles'
-            })
+            });
         }
 
         const {email, password} = req.body;
-
         const user = await User.findOne({email});
 
         if (!user) {
@@ -72,7 +68,7 @@ router.post(
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.status(400).json({message: 'Incorrect password. Try again'})
+            return res.status(400).json({message: 'Incorrect password. Try again'}); 
         }
 
         const token = jwt.sign(
@@ -82,8 +78,6 @@ router.post(
         )
 
         res.json({token, userId: user.id})
-
-
 
     } catch (e) {
         res.status(500).json({message: 'Something went wrong. Try again'});

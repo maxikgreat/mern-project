@@ -1,5 +1,6 @@
 {
-    "port": 3000,
+    "port": 5000,
     "mongoUri": "mongodb+srv://max:1234@cluster0-euaa4.mongodb.net/app?retryWrites=true&w=majority",
-    "jwtSecret": "max is the best"
+    "jwtSecret": "max is the best",
+    "baseUrl": "https://localhost:5000"
 }

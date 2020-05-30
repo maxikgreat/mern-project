@@ -1,8 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { useHttp } from '../hooks/http.hook';
 import { useMessage } from '../hooks/message.hook';
+import { AuthContext } from '../context/AuthContext';
 
 export const Auth = () => {
+    const auth = useContext(AuthContext);
     const {loading, error, request, clearError} = useHttp();
     const message = useMessage();
     const [form, setForm] = useState({
@@ -14,6 +16,10 @@ export const Auth = () => {
         message(error?.message);
         clearError();
     }, [error, message, clearError])
+
+    useEffect(() => {
+        window.M.updateTextFields();
+    }, []);
 
     const changeHandler = event => {
         setForm({
@@ -32,7 +38,7 @@ export const Auth = () => {
     const loginHandler = async () => {
         try {
             const data = await request('/api/auth/login', 'POST', {...form});
-            message(data.message);
+            auth.login(data.token, data.userId);
         } catch (e) {}
     }
 
@@ -50,6 +56,7 @@ export const Auth = () => {
                                     id="email" 
                                     type="email"
                                     name="email"
+                                    value={form.email}
                                     onChange={changeHandler}
                                 />
                                 <label htmlFor="email">Email</label>
@@ -65,6 +72,7 @@ export const Auth = () => {
                                     id="password" 
                                     type="password" 
                                     name="password"
+                                    value={form.password}
                                     onChange={changeHandler}
                                 />
                                 <label htmlFor="password">Password</label>
