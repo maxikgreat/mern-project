@@ -43,7 +43,7 @@ export const useHttp = () => {
         }
     }, []);
 
-    const clearError = () => setTimeout(() => setError(null), 3000);
+    const clearError = useCallback(() => setError(null), []);
 
     return {loading, error, request, clearError};
 }

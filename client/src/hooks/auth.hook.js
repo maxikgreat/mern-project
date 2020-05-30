@@ -30,7 +30,7 @@ export const useAuth = () => {
             login(data.token, data.userId);
         }
         setReady(true);
-    }, [login]);
+    }, [login, setReady]);
 
     return {login, logout, token, userId, ready};
 }
